@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+
+import argparse
+import struct
+from elftools.elf.elffile import ELFFile
+
+parser = argparse.ArgumentParser()
+parser.add_argument("file", metavar="FILE")
+group = parser.add_mutually_exclusive_group(required=True)
+group.add_argument("-s", "--skip-first-instruction", action="store_true", default=False)
+group.add_argument("-i", "--insert-nop", action="store_true", default=False)
+parser.add_argument("-w", "--word", metavar="NAME", required=True)
+args = parser.parse_args()
+
+if args.insert_nop:
+    words = ["$BF00 h,"]
+else:
+    words = []
+
+with open(args.file, "rb") as f:
+    e = ELFFile(f)
+    for sect in e.iter_sections():
+        if sect["sh_type"] == "SHT_PROGBITS" and sect["sh_size"] > 0:
+            words += [f"${i:04X} h," for (i,) in struct.iter_unpack("<H", sect.data())]
+print(f": {args.word} [", end="")
+start_index = 1 if args.skip_first_instruction else 0
+for i in range(start_index, len(words), 4):
+    print(f"\n  {' '.join(words[i:i+4])}", end="")
+print(" ] ;")
