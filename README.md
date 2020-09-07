@@ -7,7 +7,7 @@ Generated words are to be used with [Mecrisp Forth](http://mecrisp.sourceforge.n
 Example
 -------
 
-`test.S` :
+Input assembly source file - `test.S`:
 
 <pre><code>
   .syntax unified
@@ -33,7 +33,7 @@ Forth code generation :
 
 `$ elf2fth -s -w test-1 test.o > test.forth`
 
-`test.forth` :
+Generated word - `test.forth` :
 
 <pre><code>
 : test-1 [
